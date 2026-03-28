@@ -1,0 +1,5 @@
+department_id,department_name,floor,building,head_doctor_id,capacity
+cardiology,Cardiology,3,Main Building,D201,50
+emergency,Emergency,1,Main Building,D202,80
+orthopedics,Orthopedics,2,East Wing,D203,40
+neurology,Neurology,4,Main Building,D204,35

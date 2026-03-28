@@ -1,0 +1,7 @@
+diagnosis_code,diagnosis_name,category,severity,average_treatment_cost,typical_stay_days
+I10,Essential Hypertension,Cardiovascular,Moderate,2500,3
+I25,Chronic Ischemic Heart Disease,Cardiovascular,High,3200,4
+J15,Bacterial Pneumonia,Respiratory,Moderate,1800,1
+M16,Osteoarthritis of Hip,Musculoskeletal,High,5000,5
+G40,Epilepsy,Neurological,Moderate,2800,2
+E11,Type 2 Diabetes,Endocrine,High,3500,3

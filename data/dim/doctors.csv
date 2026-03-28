@@ -1,0 +1,5 @@
+doctor_id,doctor_name,specialization,department_id,years_experience,email,phone
+D201,Dr. Sarah Johnson,Cardiologist,cardiology,12,sarah.johnson@hospital.com,555-0201
+D202,Dr. Michael Chen,ER Physician,emergency,8,michael.chen@hospital.com,555-0202
+D203,Dr. Emily Rodriguez,Orthopedic Surgeon,orthopedics,15,emily.rodriguez@hospital.com,555-0203
+D204,Dr. James Wilson,Neurologist,neurology,10,james.wilson@hospital.com,555-0204
