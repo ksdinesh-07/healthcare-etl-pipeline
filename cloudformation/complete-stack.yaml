@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Complete Healthcare ETL Pipeline Infrastructure
+
+Resources:
+  HealthcareBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: healthcare-etl-pipelin-ks
+
+  HealthcareSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: healthcare-etl-alerts
+
+  GlueRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: glue-healthcare-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: glue.amazonaws.com}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  FactCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: healthcare-fact-crawler
+      Role: !GetAtt GlueRole.Arn
+      DatabaseName: healthcare_db
+      Targets:
+        S3Targets:
+          - Path: !Sub s3://${HealthcareBucket}/daily-visits/
