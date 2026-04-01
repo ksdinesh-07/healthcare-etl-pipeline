@@ -1,0 +1,16 @@
+{
+  "name": "s3-healthcare-trigger",
+  "description": "Triggers Step Function when new files arrive in daily-visits folder",
+  "eventPattern": {
+    "source": ["aws.s3"],
+    "detail-type": ["Object Created"],
+    "detail": {
+      "bucket": {"name": ["healthcare-etl-pipelin-ks"]},
+      "object": {"key": [{"prefix": "daily-visits/"}]}
+    }
+  },
+  "targets": [{
+    "arn": "arn:aws:states:us-east-1:${ACCOUNT_ID}:stateMachine:healthcare-etl-pipeline",
+    "roleArn": "arn:aws:iam::${ACCOUNT_ID}:role/eventbridge-stepfunction-role"
+  }]
+}
