@@ -1,0 +1,104 @@
+{
+  "Comment": "Healthcare ETL Pipeline - Complete Workflow",
+  "StartAt": "Start Crawler",
+  "States": {
+    "Start Crawler": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+      "Parameters": {
+        "Name": "healthcare-fact-crawler"
+      },
+      "Next": "Wait for Crawler",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Failure Notification"
+        }
+      ]
+    },
+    "Wait for Crawler": {
+      "Type": "Wait",
+      "Seconds": 45,
+      "Next": "Start Glue Job"
+    },
+    "Start Glue Job": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:startJobRun",
+      "Parameters": {
+        "JobName": "healthcare-visits-job"
+      },
+      "Next": "Wait for Glue Job",
+      "ResultPath": "$.JobRun",
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "Failure Notification"
+        }
+      ]
+    },
+    "Wait for Glue Job": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "Get Job Status"
+    },
+    "Get Job Status": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:getJobRun",
+      "Parameters": {
+        "JobName": "healthcare-visits-job",
+        "RunId.$": "$.JobRun.JobRunId"
+      },
+      "Next": "Check Job Status",
+      "ResultPath": "$.JobResult"
+    },
+    "Check Job Status": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.JobResult.JobRun.JobRunState",
+          "StringEquals": "SUCCEEDED",
+          "Next": "Success Notification"
+        },
+        {
+          "Variable": "$.JobResult.JobRun.JobRunState",
+          "StringEquals": "FAILED",
+          "Next": "Failure Notification"
+        }
+      ],
+      "Default": "Wait for Glue Job"
+    },
+    "Success Notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:${ACCOUNT_ID}:healthcare-etl-alerts",
+        "Message": {
+          "Input": {
+            "status": "SUCCESS",
+            "message": "Healthcare ETL pipeline completed successfully",
+            "timestamp.$": "$$.State.EnteredTime"
+          }
+        },
+        "Subject": "Healthcare ETL Success"
+      },
+      "End": true
+    },
+    "Failure Notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:${ACCOUNT_ID}:healthcare-etl-alerts",
+        "Message": {
+          "Input": {
+            "status": "FAILED",
+            "message": "Healthcare ETL pipeline failed",
+            "error.$": "$.error",
+            "timestamp.$": "$$.State.EnteredTime"
+          }
+        },
+        "Subject": "Healthcare ETL Failure"
+      },
+      "End": true
+    }
+  }
+}
